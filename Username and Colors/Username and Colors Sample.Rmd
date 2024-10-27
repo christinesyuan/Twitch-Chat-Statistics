@@ -1,0 +1,54 @@
+---
+title: "Username and Colors Sample"
+author: "Christine Yuan"
+output: pdf_document
+---
+
+```{r}
+library("readr")
+dataframe <- read_csv("twitch-chat-2236538812.csv")
+```
+
+## Top 20 Chatters
+```{r}
+usernames <- dataframe[, 2]
+count_chat <- table(usernames)
+sorted_chat_number <- rev(sort(count_chat))
+names(sorted_chat_number)[15] <- "m_silveira" # japanese characters removed
+head(sorted_chat_number, 20)
+```
+
+```{r}
+mean_chat <- mean(count_chat)
+mean_chat
+```
+
+### The mean number of messages a chatter sends out is 6.82. 
+
+```{r}
+unique_usernames <- unique(usernames)
+nrow(unique_usernames)
+```
+### There are 2979 unique people who chatted.
+
+\newpage
+
+## Top 20 Colors
+```{r}
+color <- dataframe[, 3]
+sorted_color <- sort(table(color), decreasing = TRUE)
+larger_color <- head(sorted_color, 20)
+larger_color
+```
+
+
+```{r}
+pie(c(larger_color, nrow(usernames) - sum(larger_color)), labels = c(names(larger_color), "Other"), col = c(names(larger_color), "grey"), main = "Frequency of Username Colors Appearing in Chat")
+
+```
+
+```{r}
+unique_color <- table(unique(color))
+sum(unique_color)
+```
+### There are 393 unique colors in chatter's usernames.
