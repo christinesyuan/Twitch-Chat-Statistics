@@ -8,4 +8,4 @@ field,2 -> "field,2"
 
 For quotes within a message, use double quotes "" instead of single quotes. "Hi" -> ""Hi""
 
-Characters like Chinese or Japanese characters don't translate to LATEX if using R, may require manual editing. 
+Non-ASCII letters (Chinese characters, unicode symbols) don't translate to LATEX if using R. One-offs like usernames can be manually edited. For repeated instances, knitting to HTML may work.
