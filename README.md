@@ -7,3 +7,5 @@ If messages contain a comma, enclose the field with quotes.
 field,2 -> "field,2" 
 
 For quotes within a message, use double quotes "" instead of single quotes. "Hi" -> ""Hi""
+
+Characters like Chinese or Japanese characters don't translate to LATEX if using R, may require manual editing. 
