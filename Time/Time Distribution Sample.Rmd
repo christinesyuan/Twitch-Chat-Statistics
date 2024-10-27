@@ -1,7 +1,6 @@
 ---
 title: "Time Distribution Sample"
 author: "Christine Yuan"
-date: "2024-08-29"
 output: pdf_document
 ---
 
