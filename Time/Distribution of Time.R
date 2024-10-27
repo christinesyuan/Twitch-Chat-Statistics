@@ -1,3 +1,5 @@
+# Designed to be replicable with your own CSV files! 
+
 library("readr")
 dataframe <- read_csv("insert_csv_file")
 library("ggplot2")
@@ -26,5 +28,4 @@ time_convert <- function(x) {
 ggplot(dataframe, aes(x = time)) + geom_histogram(bins = 24, color = "black", fill = "lightblue") + xlab("Time") + ylab("Frequency") + labs(title = "Distribution of Messages over Time") + theme_minimal()
 
 ggplot(dataframe, aes(x = time)) + geom_density(alpha = 0.3, fill = "red") + xlab("Time") + ylab("Density") + labs(title = "Density of Messages over Time") + theme_minimal()
-
 # to convert time into hourly form, you can use "+ scale_x_continuous(label = seq(0, insert_max_hour), breaks = seq(0, insert_max_time, 3600))"
