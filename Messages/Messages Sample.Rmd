@@ -1,0 +1,25 @@
+---
+title: "Messages Sample"
+author: "Christine Yuan"
+output: pdf_document
+---
+
+```{r}
+library("readr")
+dataframe <- read_csv("twitch-chat-2236538812.csv", show_col_types = FALSE)
+```
+
+# Top 100 Most Sent Words
+```{r}
+messages <- dataframe[, 4]
+unlisted_messages <- unlist(messages)
+split_messages <- unlist(strsplit(unlisted_messages, split = " "))
+table_messages <- table(split_messages)
+sorted_messages <- rev(sort(table_messages))
+sorted_messages[seq(1, 30)]
+```
+
+```{r}
+sum(split_messages == "WHAT")
+```
+
