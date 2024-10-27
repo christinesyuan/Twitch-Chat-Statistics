@@ -1,0 +1,48 @@
+---
+title: "Twitch Chat Statistics Sample"
+author: "Christine Yuan"
+date: "2024-08-29"
+output: pdf_document
+---
+
+```{r}
+library("readr")
+dataframe <- read_csv("twitch-chat-2236538812.csv")
+library("ggplot2")
+```
+
+
+```{r}
+time_convert <- function(x) {
+  minutes <- x %/% 60
+  seconds <- x %% 60
+  if (minutes > 60) { 
+    hours <- minutes %/% 60
+    minutes <- minutes %% 60
+  }
+  else {
+    hours = "00"
+  }
+  if (minutes < 10) {
+    minutes <- paste("0", minutes, sep = "")
+  }
+  if (seconds < 10) {
+    seconds <- paste("0", seconds, sep = "")
+  }
+  display <- paste(hours, minutes, seconds, sep = ":")
+  display
+}
+```
+
+\newpage
+
+```{r}
+ggplot(dataframe, aes(x = time)) + geom_histogram(bins = 24, color = "black", fill = "lightblue") + xlab("Hour") + ylab("Frequency") + scale_x_continuous(label = seq(0, 11), breaks = seq(0, 41258, 3600)) + labs(title = "Distribution of Messages over Time") + theme_minimal()
+
+```
+
+\newpage 
+
+```{r}
+ggplot(dataframe, aes(x = time)) + geom_density(alpha = 0.3, fill = "red") + xlab("Hour") + ylab("Density") + scale_x_continuous(label = seq(0, 11), breaks = seq(0, 41258, 3600)) + labs(title = "Density of Messages over Time") + theme_minimal()
+```
