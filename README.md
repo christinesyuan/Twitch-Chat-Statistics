@@ -4,9 +4,7 @@ Using www.twitchchatdownloader.com, you can obtain a CSV file of a VOD's chat, w
 
 Troubleshooting:
 If experiencing trouble with your CSV file, your CSV file may contain messages with a comma or quotation marks. 
-  If messages contain a comma, enclose the field with quotes.
-    field,2 -> "field,2" 
-  For quotes within a message, use double quotes "" instead of single quotes. 
-    "Hi" -> ""Hi""
+- If messages contain a comma, enclose the field with quotes. (field,2 -> "field,2")
+- For quotes within a message, use double quotes "" instead of single quotes. ("Hi" -> ""Hi"")
 
 Non-ASCII letters (Chinese characters, unicode symbols) don't translate to LATEX if using R. One-offs like usernames can be manually edited. For repeated instances, knitting to HTML can bypass the error. 
