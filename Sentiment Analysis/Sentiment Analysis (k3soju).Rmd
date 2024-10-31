@@ -1,0 +1,130 @@
+---
+title: "Sentiment Analysis: k3soju"
+author: "Christine Yuan"
+output: pdf_document
+---
+
+### Setup 
+
+```{r}
+library(readr)
+library(tidytext)
+library(textdata)
+library(dplyr)
+library(ggplot2)
+library(ggnewscale)
+dataframe <- read_csv("twitch-chat-2264691725.csv", show_col_types = FALSE)
+messages <- dataframe[, 4]
+unlisted_messages <- unlist(messages)
+vector_split_messages <- unlist(strsplit(unlisted_messages, split = " "))
+split_messages <- data.frame(vector_split_messages)
+names(split_messages) <- "Word"
+```
+
+\newpage
+
+### NRC Custom Lexicon, Top 150 Most Used Words in Twitch Chat with Sentiment
+
+```{r}
+nrc_sentiment <- get_sentiments(lexicon = "nrc")
+nrc_lexicon <- data.frame("Word" = nrc_sentiment$word, "Sentiment" = nrc_sentiment$sentiment)
+nrc_lexicon <- nrc_lexicon[nrc_lexicon$Sentiment == "positive" | nrc_lexicon$Sentiment == "negative", ]
+```
+
+```{r}
+nrc_twitch_words <- c("xdd", "Segz", "deal", "Dance", "o7", "widetime", "no", "widetime3", "widetime2", "vibee", "buddy", "xddtime", "wideduckass", "HAH", "WIDESEXO", "widetimeFAST", "nay", "glorpJam", "ddx", "donkiWalk", "howisthisskeletonDancing", "bricks", "SAJ", "lebronJAM", "SEXO", "PogO", "jorkin", "DinoDance", "?", "bricksuko", "wideVibe", "xddConga", "Praying", "SCHIZO", "ICANT", "peepoAwesome", "Wokege", "wideNessie", "wideBoris", "widewawa", "HOLY", "ReallyMad", "HUH", "gg", "yay", "gm", "fatasswizardcastsbarrier", "YAP", "UltraMad", "ABOBA", "TAH", "peepoUppies", "Bedge", "RAGEY", "peepoAwesome", "BEAVERMODE")
+nrc_twitch_words_sentiment <- c("laugh at", "movement emote", "positive emote", "positive emote", "laugh at", "movement emote", "negative", "movement emote", "movement emote", "positive emote", "laugh at", "laugh at", "movement emote", "laugh at", "positive emote", "movement emote", "negative", "movement emote", "laugh at", "movement emote", "movement emote", "negative", "negative emote", "positive emote", "positive emote", "positive emote", "positive emote", "movement emote", "negative", "negative emote", "positive emote", "laugh at", "positive emote", "negative emote", "laugh at", "positive emote", "positive emote", "movement emote", "movement emote", "movement emote", "positive emote", "negative emote", "laugh at", "positive", "positive", "laugh at", "movement emote", "laugh at", "negative emote", "laugh at", "movement emote", "positive emote", "negative emote", "negative emote", "positive emote", "positive emote")
+nrc_twitch_lexicon <- data.frame("Word" = nrc_twitch_words, "Sentiment" = nrc_twitch_words_sentiment)
+
+nrc_new_lexicon <- rbind(nrc_lexicon, nrc_twitch_lexicon)
+```
+
+### NRC Sentiment Analysis Graph 
+
+```{r}
+# Join with sentiment lexicon to classify words
+nrc_sentiment <- split_messages %>%
+  inner_join(nrc_new_lexicon, by = "Word") %>%
+  count(Word, Sentiment, sort = TRUE) %>%
+  ungroup()
+
+# Filter
+filter_nrc_sentiment <- nrc_sentiment[nrc_sentiment$n >= 150, ]
+
+# Plot the sentiment analysis results
+filter_nrc_sentiment %>%
+  ggplot(aes(x = factor(Word), y = n, fill = Sentiment)) +
+  geom_col(position = "dodge", color = "black", linewidth = 0.2) +
+  labs(title = "NRC Sentiment Analysis", x = "Text ID", y = "Count") +
+  scale_fill_manual(values = c("positive" = "green", "negative" = "red", "movement emote" = "orange", "laugh at" = "blue", "positive emote" = "pink", "negative emote" = "skyblue")) +
+  theme_minimal() +
+  theme(text = element_text(size = 7),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3))
+```
+
+\newpage
+
+### Flat Sentiment Analysis Graph (What happens if we don't create a custom lexicon?)
+
+```{r}
+flat_nrc_messages <- semi_join(split_messages, nrc_lexicon)
+flat_nrc_sentiment <- split_messages %>%
+  inner_join(nrc_lexicon, by = "Word") %>%
+  count(Word, Sentiment, sort = TRUE) %>%
+  ungroup()
+filter_flat_nrc_sentiment <- flat_nrc_sentiment[flat_nrc_sentiment$Sentiment == "negative" | flat_nrc_sentiment$Sentiment == "positive", ]
+small_flat_nrc_sentiment <- filter_flat_nrc_sentiment[-c(1, 2), ]
+
+
+# Plot the sentiment analysis results
+filter_flat_nrc_sentiment[filter_flat_nrc_sentiment$n >= 75,] %>%
+  ggplot(aes(x = factor(Word), y = n, fill = Sentiment)) +
+  geom_col(position = "dodge", color = "black", linewidth = 0.2) +
+  labs(title = "Flat NRC Sentiment Analysis", x = "Text ID", y = "Count") +
+  scale_fill_manual(values = c("positive" = "green", "negative" = "red")) +
+  theme_minimal() +
+  theme(text = element_text(size = 9),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2))
+
+```
+\newpage
+
+### Afinn Custom Lexicon
+
+```{r}
+afinn_sentiment <- get_sentiments(lexicon = "afinn")
+afinn_lexicon <- data.frame("Word" = afinn_sentiment$word, "Sentiment" = afinn_sentiment$value)
+```
+
+```{r}
+afinn_twitch_words <- c("xdd", "Segz", "deal", "Dance", "o7", "widetime", "widetime3", "widetime2", "vibee", "buddy", "xddtime", "wideduckass", "HAH", "WIDESEXO", "widetimeFAST", "nay", "glorpJam", "ddx", "donkiWalk", "howisthisskeletonDancing", "bricks", "SAJ", "lebronJAM", "SEXO", "PogO", "jorkin", "DinoDance", "?", "bricksuko", "wideVibe", "xddConga", "Praying", "SCHIZO", "ICANT", "peepoAwesome", "Wokege", "wideNessie", "wideBoris", "widewawa", "HOLY", "ReallyMad", "HUH", "gg", "yay", "gm", "fatasswizardcastsbarrier", "YAP", "UltraMad", "ABOBA", "TAH", "peepoUppies", "Bedge", "RAGEY", "peepoAwesome", "BEAVERMODE")
+afinn_twitch_words_sentiment <- c(2, 1, 3, 3, 2, 1, 1, 1, 3, 2, 2, 1, 2, 3, 2, -4, 1, 2, 1, 1, -4, -3, 3, 3, 3, 3, 1, -4, -3, 3, 2, 3, -3, 2, 3, 3, 1, 1, 1, 3, -3, 2, 4, 4, 2, 1, 2, -3, 2, 1, 3, -3, -3, 3, 3)
+afinn_twitch_lexicon <- data.frame("Word" = afinn_twitch_words, "Sentiment" = afinn_twitch_words_sentiment)
+
+afinn_new_lexicon <- rbind(afinn_lexicon, afinn_twitch_lexicon)
+```
+
+### Afinn Sentiment Analysis Graph 
+
+```{r}
+# Join with sentiment lexicon to classify words
+afinn_sentiment <- split_messages %>%
+  inner_join(afinn_new_lexicon, by = "Word") %>%
+  count(Word, Sentiment, sort = TRUE) %>%
+  ungroup()
+
+# Filter
+filter_afinn_sentiment <- afinn_sentiment[afinn_sentiment$n >= 200, ]
+filter_afinn_sentiment$Sentiment[filter_afinn_sentiment$Word == "no"] <- -4
+
+# Plot the sentiment analysis results
+filter_afinn_sentiment %>%
+  ggplot(mapping = aes(x = Word, y = Sentiment, fill = n)) +
+  geom_col(color = "black", linewidth = 0.2) +
+  theme_minimal() +
+  theme(text = element_text(size = 7),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)) +
+  scale_y_continuous(label = seq(-5, 5), breaks = seq(-5, 5)) +
+  labs(title = "Afinn Sentiment Analysis", x = "Text ID", y = "Sentiment Value", fill = "Frequency") +
+  scale_fill_gradient(low = "white", high = "purple") 
+```
