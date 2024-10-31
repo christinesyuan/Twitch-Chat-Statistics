@@ -1,5 +1,5 @@
 ---
-title: "Sentiment Analysis"
+title: "Sentiment Analysis Setsuko"
 author: "Christine Yuan"
 output: pdf_document
 ---
